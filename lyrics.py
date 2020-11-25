@@ -55,10 +55,5 @@ class LyricsMod(loader.Module):
         except lyrics.LyricScraperException:
             await utils.answer(message, self.strings('not_found', message))
             return
-        filename = uuid.uuid4().hex
-        with open(filename, 'w') as f:
-            f.write(info['lyrics'])
-        os.rename(filename, f"{info['title']}.txt")
-        await utils.answer(message, f"{info['title']}.txt", asfile=True)
-        os.remove(f"{info['title']}.txt")
+        await utils.answer(message, info['lyrics'], asfile=True, filename=f"{info['title']}.txt")
 
