@@ -55,8 +55,11 @@ class YoutubeMod(loader.Module):
                     filename = " ".join(filename.split())
                     os.rename(file, filename + '.mp3')
             splitter = max([filename.find(text) for text in [' - ', ' – ', ' — ']])
-            attrs = DocumentAttributeAudio(length, title=filename[splitter+3:], performer=filename[:splitter])
-            await self.client.send_file(entity=message.chat, file=filename+'.mp3', attributes=[attrs] if splitter > 0 else None)
+            if splitter:
+                attrs = DocumentAttributeAudio(length, title=filename[splitter+3:], performer=filename[:splitter])
+            else:
+                attrs = DocumentAttributeAudio(length, title=filename, performer='Art3sius')
+            await self.client.send_file(entity=message.chat, file=filename+'.mp3', attributes=[attrs])
             await msg.delete()
             os.remove(filename+'.mp3')
 
