@@ -21,6 +21,9 @@ class YoutubeMod(loader.Module):
         'loading': 'The video is loading, please wait'
     }
 
+    def client_ready(self, client, db):
+        self.client = client
+
     @loader.pm
     @loader.ratelimit
     async def ytdlcmd(self, message):
@@ -56,5 +59,6 @@ class YoutubeMod(loader.Module):
                     os.rename(file, filename + '.mp3')
             splitter = max([filename.find(text) for text in [' - ', ' – ', ' — ']])
             attrs = DocumentAttributeAudio(length, title=filename[splitter+3:], performer=filename[:splitter])
-            await message.respond(file=filename+'.mp3', attributes=attrs if splitter > 0 else None)
+            await self.client.send_file(file=filename+'.mp3', attributes=attrs if splitter > 0 else None)
             await msg.delete()
+            os.remove(filename+'.mp3')
