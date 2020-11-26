@@ -1,8 +1,6 @@
 # requires lyrics_extractor, transliterate
 
 import logging
-import os
-import uuid
 
 from .. import loader, utils
 
@@ -33,7 +31,6 @@ class LyricsMod(loader.Module):
             self.engine = SongLyrics(self.config['Lyrics_API'], self.config['Lyrics_Hash'])
         else:
             self.engine = None
-
 
     @loader.pm
     @loader.ratelimit
