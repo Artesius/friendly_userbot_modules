@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 @loader.tds
 class LyricsMod(loader.Module):
-    """Finds lyrics for selected song"""
+    """Finds lyrics for selected song\nMade with love by @Art3sius"""
     strings = {
         'name': 'Lyrics',
         'docstring_API': 'Google Search Engine API',

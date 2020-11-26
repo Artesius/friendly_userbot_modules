@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 @loader.tds
 class YoutubeMod(loader.Module):
-    """Gets you an audio/video file from Youtube"""
+    """Gets you an audio/video file from Youtube\nMade with love by @Art3sius"""
     strings = {
         'name': 'Youtube',
         'args_error': "Can't get the link",
@@ -24,7 +24,7 @@ class YoutubeMod(loader.Module):
     @loader.pm
     @loader.ratelimit
     async def ytdlcmd(self, message):
-        """.ytdl <link>"""
+        """Downloads an audio from Youtube\n.ytdl <link>"""
         links = message.get_entities_text(MessageEntityUrl)
         if not links:
             await utils.answer(message, self.strings('args_error', message))
