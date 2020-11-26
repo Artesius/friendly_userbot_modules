@@ -5,7 +5,7 @@ import os
 import re
 
 import youtube_dlc
-from telethon.tl.types import MessageEntityUrl
+from telethon.tl.types import DocumentAttributeAudio, MessageEntityUrl
 
 from .. import loader, utils
 
@@ -41,6 +41,7 @@ class YoutubeMod(loader.Module):
         first = True
         for _, link in links:
             msg = await (message.edit if (edit and first) else message.respond)(self.strings('loading', message))
+            first = False
             with youtube_dlc.YoutubeDL(ydl_opts) as ydl:
                 info_dict = await utils.run_sync(ydl.extract_info, link, download=True)
                 video_id = info_dict['id']
@@ -53,5 +54,7 @@ class YoutubeMod(loader.Module):
                     filename = re.sub(r'\[[^()]*\]', '', filename)
                     filename = " ".join(filename.split())
                     os.rename(file, filename + '.mp3')
-            await message.respond(file=filename+'.mp3')
+            splitter = max([filename.find(text) for text in [' - ', ' – ', ' — ']])
+            attrs = DocumentAttributeAudio(length, title=filename[splitter+3:], performer=filename[:splitter])
+            await message.respond(file=filename+'.mp3', attributes=attrs if splitter > 0 else None)
             await msg.delete()
