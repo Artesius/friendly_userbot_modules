@@ -53,7 +53,7 @@ class PurgeMod(loader.Module):
         if not message.is_reply:
             async for msg in message.client.iter_messages(
                     entity=message.to_id,
-                    limit=count):
+                    limit=count+1):
                 msgs.append(msg.id)
                 if len(msgs) >= 99:
                     await message.client.delete_messages(message.to_id, msgs)
