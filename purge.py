@@ -31,7 +31,7 @@ class PurgeMod(loader.Module):
 
         msgs = []
         async for msg in message.client.iter_messages(
-                entity=message.to_id,
+                entity=utils.get_chat_id(message),
                 min_id=message.reply_to_msg_id - 1,
                 reverse=True):
             if from_users and msg.from_id not in from_users:
@@ -52,7 +52,7 @@ class PurgeMod(loader.Module):
         count = int(args[0]) if args != [] and args[0].isdigit() else 1
         if not message.is_reply:
             async for msg in message.client.iter_messages(
-                    entity=message.to_id,
+                    entity=utils.get_chat_id(message),
                     limit=count+1):
                 msgs.append(msg.id)
                 if len(msgs) >= 99:
@@ -60,7 +60,7 @@ class PurgeMod(loader.Module):
                     msgs.clear()
         else:
             async for msg in message.client.iter_messages(
-                    entity=message.to_id,
+                    entity=utils.get_chat_id(message),
                     limit=count,
                     min_id=message.reply_to_msg_id - 1,
                     reverse=True):
