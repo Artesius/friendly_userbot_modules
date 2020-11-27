@@ -46,7 +46,7 @@ class PurgeMod(loader.Module):
     @loader.sudo
     @loader.ratelimit
     async def delcmd(self, message):
-        """Delete [n] messages after replied\n.del [n=1]"""
+        """Delete last [n] messages or after the replied one\n.del [n=1]"""
         msgs = [message.id]
         args = utils.get_args(message)
         count = int(args[0]) if args != [] and args[0].isdigit() else 1
