@@ -35,7 +35,7 @@ class LyricsMod(loader.Module):
     @loader.pm
     @loader.ratelimit
     async def lyricscmd(self, message):
-        """.lyrics <song>"""
+        """Search for lyrics on a <song>\n.lyrics <song>"""
         if self.engine is None:
             await utils.answer(message, self.strings('missing_token', message))
             return
