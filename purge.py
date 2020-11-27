@@ -50,7 +50,7 @@ class PurgeMod(loader.Module):
         """Delete [n] messages after replied\n.del [n=1]"""
         msgs = [message.id]
         args = utils.get_args(message)
-        count = args[0] if args != [] else 1
+        count = int(args[0]) if args != [] and args[0].isdigit else 1
         async for msg in message.client.iter_messages(
                 entity=message.to_id,
                 limit=count,
