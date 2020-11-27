@@ -47,20 +47,26 @@ class PurgeMod(loader.Module):
     @loader.ratelimit
     async def delcmd(self, message):
         """Delete [n] messages after replied\n.del [n=1]"""
-        if not message.is_reply:
-            await utils.answer(message, self.strings('not_reply', message))
-            return
         msgs = [message.id]
         args = utils.get_args(message)
         count = int(args[0]) if args != [] and args[0].isdigit() else 1
-        async for msg in message.client.iter_messages(
-                entity=message.to_id,
-                limit=count,
-                min_id=message.reply_to_msg_id - 1,
-                reverse=True):
-            msgs.append(msg.id)
-            if len(msgs) >= 99:
-                await message.client.delete_messages(message.to_id, msgs)
-                msgs.clear()
+        if not message.is_reply:
+            async for msg in message.client.iter_messages(
+                    entity=message.to_id,
+                    limit=count):
+                msgs.append(msg.id)
+                if len(msgs) >= 99:
+                    await message.client.delete_messages(message.to_id, msgs)
+                    msgs.clear()
+        else:
+            async for msg in message.client.iter_messages(
+                    entity=message.to_id,
+                    limit=count,
+                    min_id=message.reply_to_msg_id - 1,
+                    reverse=True):
+                msgs.append(msg.id)
+                if len(msgs) >= 99:
+                    await message.client.delete_messages(message.to_id, msgs)
+                    msgs.clear()
         if msgs:
             await message.client.delete_messages(message.to_id, msgs)
