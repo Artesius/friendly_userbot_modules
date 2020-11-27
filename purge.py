@@ -8,9 +8,8 @@ logger = logging.getLogger(__name__)
 @loader.tds
 class PurgeMod(loader.Module):
     """Delete your messages\nRemade with love by @Art3sius"""
-    strings = {"name": "Purge",
-               "not_supergroup_bot": "<b>Purges can only take place in supergroups</b>",
-               "delete_what": "<b>What message should be deleted?</b>"}
+    strings = {'name': 'Purge',
+               'not_reply': '<i>You should reply to a message</i>'}
 
     @loader.sudo
     @loader.ratelimit
@@ -48,13 +47,16 @@ class PurgeMod(loader.Module):
     @loader.ratelimit
     async def delcmd(self, message):
         """Delete [n] messages after replied\n.del [n=1]"""
+        if not message.is_reply:
+            await utils.answer(message, self.strings('not_reply', message))
+            return
         msgs = [message.id]
         args = utils.get_args(message)
         count = int(args[0]) if args != [] and args[0].isdigit else 1
         async for msg in message.client.iter_messages(
                 entity=message.to_id,
                 limit=count,
-                min_id=message.reply_to_msg_id if message.is_reply else message.id,
+                min_id=message.reply_to_msg_id - 1,
                 reverse=True):
             msgs.append(msg.id)
             if len(msgs) >= 99:

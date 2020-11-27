@@ -17,8 +17,8 @@ class YoutubeMod(loader.Module):
     """Get you an audio/video file from Youtube\nMade with love by @Art3sius"""
     strings = {
         'name': 'Youtube',
-        'args_error': "Can't get the link",
-        'loading': 'The video is loading, please wait'
+        'args_error': "<i>Can't get the link</i>",
+        'loading': '<b>The video is loading, please wait</b>'
     }
 
     @loader.pm

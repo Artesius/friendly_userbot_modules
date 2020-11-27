@@ -17,9 +17,9 @@ class LyricsMod(loader.Module):
         'name': 'Lyrics',
         'docstring_API': 'Google Search Engine API',
         'docstring_Hash': 'Google Search Engine Hash',
-        'missing_token': 'API or hash tokens are missing',
-        'args_error': "You didn't specify the song",
-        'not_found': 'Invalid song'
+        'missing_token': '<i>API or hash tokens are missing</i>',
+        'args_error': "<i>You didn't specify the song</i>",
+        'not_found': '<i>Invalid song</i>'
     }
 
     def __init__(self):
