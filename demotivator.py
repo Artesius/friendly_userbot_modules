@@ -20,11 +20,12 @@ logger = logging.getLogger(__name__)
 
 
 @loader.tds
-class DeMoTiVaToRsMod(loader.Module):
-    """Demotivators by @DneZyeK\nRemade with love by @Art3sius"""
+class DemotivatorMod(loader.Module):
+    """Demotivators creating\nRemade with love by @Art3sius"""
     strings = {
         'name': 'Demotivator',
-        'incorrect_filetype': 'I could handle only images and videos'
+        'incorrect_filetype': '<i>Incorrect_filetype</i>',
+        'process_started': '<b>Demotivating...</b>'
     }
 
     @loader.pm
@@ -52,7 +53,8 @@ class DeMoTiVaToRsMod(loader.Module):
         if not text:
             text = choice(standart_response)
 
-        await message.edit("<b>Демотивирую...</b>")
+        edit = message.out
+        mess = await (message.edit if edit else message.respond)(self.strings('process_started', message))
         if msg.file.mime_type.split("/")[0].lower() == 'image':
             bytes_file = await msg.download_media(bytes)
             demotivator = demote_image(bytes_file, text, mode)
@@ -61,8 +63,9 @@ class DeMoTiVaToRsMod(loader.Module):
             with open(filename, 'wb') as file:
                 await msg.download_media(file)
             demotivator = demote_video(filename, text)
-        await message.delete()
+
         await msg.reply(file=demotivator)
+        await mess.delete()
         os.remove(demotivator)
 
     async def client_ready(self, client, db):
