@@ -59,7 +59,7 @@ class YoutubeMod(loader.Module):
                 attrs = DocumentAttributeAudio(length, title=filename[splitter+3:], performer=filename[:splitter])
             else:
                 attrs = DocumentAttributeAudio(length, title=filename, performer='Art3sius')
-            await self.client.send_file(entity=utils.get_user(message), file=filename+'.mp3', attributes=[attrs])
+            await self.client.send_file(entity=message.chat, file=filename+'.mp3', attributes=[attrs])
             await msg.delete()
             os.remove(filename+'.mp3')
 
