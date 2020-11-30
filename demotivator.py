@@ -207,5 +207,5 @@ standart_response = ['А че', 'заставляет задуматься', 'Ж
                      'Всем похуй!\n\nВсем похуй!', 'БРАТЬЯ СЛАВЯНЕ\n\nпомните друг о друге',
                      '\n\nОН ПРИДУМАЛ ГОВНО\n\nа ты даже не знаешь его имени', '\n\nкраткий курс истории нацболов',
                      'Эпоха ренессанса']
-font_bytes = requests.get("https://raw.githubusercontent.com/KeyZenD/l/master/times.ttf").content
+font_file = requests.get("https://raw.githubusercontent.com/KeyZenD/l/master/times.ttf").content
 audio_file = requests.get('https://raw.githubusercontent.com/Artesius/friendly_userbot_modules/main/demotivator_files/audio.mp3').content
