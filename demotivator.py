@@ -134,6 +134,9 @@ def demote_video(video, text):
 
     filename3 = str(uuid.uuid4().hex) + '.mp4'
     img = ffmpeg.input(filename2)
+    if not os.path.isfile('audio.mp3'):
+        with open('audio.mp3', 'wb') as file:
+            file.write(audio_file)
     audio = ffmpeg.input('audio.mp3')
     (
         ffmpeg
@@ -204,4 +207,5 @@ standart_response = ['А че', 'заставляет задуматься', 'Ж
                      'Всем похуй!\n\nВсем похуй!', 'БРАТЬЯ СЛАВЯНЕ\n\nпомните друг о друге',
                      '\n\nОН ПРИДУМАЛ ГОВНО\n\nа ты даже не знаешь его имени', '\n\nкраткий курс истории нацболов',
                      'Эпоха ренессанса']
-font_file = requests.get("https://raw.githubusercontent.com/KeyZenD/l/master/times.ttf").content
+font_file = requests.get('https://raw.githubusercontent.com/Artesius/friendly_userbot_modules/blob/main/demotivator_files/font.ttf').content
+audio_file = requests.get('https://raw.githubusercontent.com/Artesius/friendly_userbot_modules/main/demotivator_files/audio.mp3').content
