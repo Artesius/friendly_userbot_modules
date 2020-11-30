@@ -124,7 +124,7 @@ def demote_video(video, text):
     filename = str(uuid.uuid4().hex) + '.jpg'
     cv2.imwrite(filename, last_frame)
     image = draw_main(filename, 0)
-    text_image = draw_text(fill(text), image, min(image.size) // 5)
+    text_image = draw_text('\n'.join([fill(line) for line in text.split('\n')]), image, min(image.size) // 5)
     output = merge(image, text_image)
     source = Image.open(filename)
     output = output.resize(source.size)
