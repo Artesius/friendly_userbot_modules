@@ -55,7 +55,7 @@ class YoutubeMod(loader.Module):
                     filename = " ".join(filename.split())
                     os.rename(file, filename + '.mp3')
             splitter = max([filename.find(text) for text in [' - ', ' – ', ' — ']])
-            if splitter:
+            if splitter > -1:
                 attrs = DocumentAttributeAudio(length, title=filename[splitter+3:], performer=filename[:splitter])
             else:
                 attrs = DocumentAttributeAudio(length, title=filename, performer='Art3sius')
