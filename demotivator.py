@@ -30,7 +30,7 @@ class DeMoTiVaToRsMod(loader.Module):
     @loader.pm
     @loader.ratelimit
     async def demoticmd(self, message):
-        """Add a demotivator under your image"""
+        """Add a demotivator under your file"""
         await self.cmds(message, 0)
 
     @loader.pm
