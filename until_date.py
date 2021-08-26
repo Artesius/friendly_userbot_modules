@@ -20,7 +20,7 @@ class UntilDateMod(loader.Module):
         self.client = client
 
         scheduler = AsyncIOScheduler()
-        scheduler.add_job(self.checks, 'interval', seconds=1)
+        scheduler.add_job(self.checks, 'interval', seconds=10)
         scheduler.start()
 
     async def checks(self):
