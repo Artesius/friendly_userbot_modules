@@ -25,7 +25,7 @@ class UntilDateMod(loader.Module):
 
     async def checks(self):
         now = datetime.datetime.now()
-        target = datetime.datetime(2021, 8, 31, 15, 30)
+        target = datetime.datetime(2021, 8, 31, 12, 30)
         res = target - now
         if res.days < 0 or res.seconds < 0:
             return
