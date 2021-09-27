@@ -8,30 +8,28 @@ import logging
 import PIL
 import requests
 from telethon import utils
-from telethon.tl.types import (ChannelParticipantCreator,
-                               ChannelParticipantsAdmins, ChatPhotoEmpty,
-                               DocumentAttributeSticker, Message,
-                               MessageEntityBold, MessageEntityBotCommand,
-                               MessageEntityCashtag, MessageEntityCode,
-                               MessageEntityHashtag, MessageEntityItalic,
-                               MessageEntityMention, MessageEntityMentionName,
-                               MessageEntityPhone, MessageEntityStrike,
-                               MessageEntityTextUrl, MessageEntityUnderline,
-                               MessageEntityUrl, MessageMediaDocument,
-                               MessageMediaPhoto, MessageMediaWebPage,
-                               PeerBlocked, PeerChannel, PeerChat, PeerUser,
-                               User)
+from telethon.tl.types import (
+    Message, MessageEntityBold, MessageEntityItalic,
+    MessageEntityMention, MessageEntityTextUrl,
+    MessageEntityCode, MessageEntityMentionName,
+    MessageEntityHashtag, MessageEntityCashtag,
+    MessageEntityBotCommand, MessageEntityUrl,
+    MessageEntityStrike, MessageEntityUnderline,
+    MessageEntityPhone,
+    ChatPhotoEmpty,
+    MessageMediaPhoto, MessageMediaDocument, MessageMediaWebPage,
+    User,
+    PeerUser, PeerBlocked, PeerChannel, PeerChat,
+    DocumentAttributeSticker,
+    ChannelParticipantsAdmins,
+    ChannelParticipantCreator
+)
 
-from .. import loader
-from .. import utils as ftgUtils
+from .. import loader, utils as ftgUtils
 
 logger = logging.getLogger(__name__)
 
-null = None
-false = False
-true = True
-
-PIL.Image.MAX_IMAGE_PIXELS = null
+PIL.Image.MAX_IMAGE_PIXELS = None
 
 
 class dict(dict):
@@ -39,23 +37,23 @@ class dict(dict):
         self[attr] = value
 
 
-BUILD_ID = ""  # null to disable autoupdates
+BUILD_ID = None  # null to disable autoupdates
 MODULE_PATH = "https://quotes.mishase.dev/f/module.py"
 
 
 @loader.tds
 class mQuotesMod(loader.Module):
-    """Quote a message using Mishase Quotes API\nStable version by @Art3sius"""
+    """Quote a message using Mishase Quotes API\nRemade with love by @Art3sius"""
     strings = {
         "name": "Quotes"
     }
 
     def __init__(self):
         self.config = loader.ModuleConfig(
-            "QUOTE_MESSAGES_LIMIT", 50, "Messages limit",
+            "QUOTE_MESSAGES_LIMIT", 5, "Messages limit",
             "MAX_WIDTH", 384, "Max width (px)",
             "SCALE_FACTOR", 5, "Scale factor",
-            "SQUARE_AVATAR", false, "Square avatar",
+            "SQUARE_AVATAR", False, "Square avatar",
             "TEXT_COLOR", "white", "Text color",
             "REPLY_LINE_COLOR", "white", "Reply line color",
             "REPLY_THUMB_BORDER_RADIUS", 2, "Reply thumbnail radius (px)",
@@ -82,41 +80,41 @@ class mQuotesMod(loader.Module):
             msg = await msg.reply("_")
 
         count = 1
-        forceDocument = false
+        force_document = False
 
         if args:
             args = args.split()
-            forceDocument = "file" in args
+            force_document = "file" in args
             try:
                 count = next(int(arg) for arg in args if arg.isdigit())
                 count = max(1, min(self.config["QUOTE_MESSAGES_LIMIT"], count))
             except StopIteration:
                 pass
 
-        messagePacker = MessagePacker(self.client)
+        message_packer = MessagePacker(self.client)
 
         if count == 1:
             await msg.edit("<b>Processing...</b>")
-            await messagePacker.add(reply)
+            await message_packer.add(reply)
         if count > 1:
             it = self.client.iter_messages(
                 reply.peer_id, offset_id=reply.id,
-                reverse=true, add_offset=1, limit=count
+                reverse=True, add_offset=1, limit=count
             )
 
             i = 1
             async for message in it:
                 await msg.edit(f"<b>Processing {i}/{count}</b>")
                 i += 1
-                await messagePacker.add(message)
+                await message_packer.add(message)
 
-        messages = messagePacker.messages
+        messages = message_packer.messages
 
         if not messages:
             return await msg.edit("No messages to quote")
 
         files = []
-        for f in messagePacker.files.values():
+        for f in message_packer.files.values():
             files.append(("files", f))
 
         if not files:
@@ -162,7 +160,7 @@ class mQuotesMod(loader.Module):
         PIL.Image.open(io.BytesIO(resp.content)).save(image, "WEBP")
         image.seek(0)
 
-        await self.client.send_message(msg.peer_id, file=image, force_document=forceDocument)
+        await self.client.send_message(msg.peer_id, file=image, force_document=force_document)
 
         await msg.delete()
 
@@ -172,11 +170,11 @@ class mQuotesMod(loader.Module):
         """Fake message quote. Args: @<username>/<id>/<reply> <text>"""
         args = ftgUtils.get_args_raw(msg)
         reply = await msg.get_reply_message()
-        splitArgs = args.split(maxsplit=1)
-        if len(splitArgs) == 2 and (splitArgs[0].startswith("@") or splitArgs[0].isdigit()):
-            user = splitArgs[0][1:] if splitArgs[0].startswith(
-                "@") else int(splitArgs[0])
-            text = splitArgs[1]
+        split_args = args.split(maxsplit=1)
+        if len(split_args) == 2 and (split_args[0].startswith("@") or split_args[0].isdigit()):
+            user = split_args[0][1:] if split_args[0].startswith(
+                "@") else int(split_args[0])
+            text = split_args[1]
         elif reply:
             user = reply.sender_id
             text = args
@@ -188,11 +186,11 @@ class mQuotesMod(loader.Module):
         except Exception:
             return await msg.edit("User not found")
 
-        async def getMessage():
+        async def get_message():
             return Message(0, uid, message=text)
 
         msg.message = ""
-        msg.get_reply_message = getMessage
+        msg.get_reply_message = get_message
 
         await self.quotecmd(msg)
 
@@ -204,53 +202,55 @@ class MessagePacker:
         self.client = client
 
     async def add(self, msg):
-        packed = await self.packMessage(msg)
+        packed = await self.pack_message(msg)
         if packed:
             self.messages.append(packed)
 
-    async def packMessage(self, msg):
+    async def pack_message(self, msg):
         obj = dict()
 
         text = msg.message
         if text:
             obj.text = text
 
-        entities = MessagePacker.encodeEntities(msg.entities or [])
+        entities = MessagePacker.encode_entities(msg.entities or [])
         if entities:
             obj.entities = entities
 
         media = msg.media
         if media:
-            file = await self.downloadMedia(media)
+            file = await self.download_media(media)
             if file:
                 obj.picture = {
                     "file": file
                 }
 
         if "text" not in obj and "picture" not in obj:
-            return null
+            return
 
-        obj.author = await self.encodeAuthor(msg)
+        obj.author = await self.encode_author(msg)
 
         reply = await msg.get_reply_message()
         if reply:
-            obj.reply = await self.encodeReply(reply)
+            obj.reply = await self.encode_reply(reply)
 
         return obj
 
-    def encodeEntities(entities):
-        encEntities = []
+    @staticmethod
+    def encode_entities(entities):
+        enc_entities = []
         for entity in entities:
-            entityType = MessagePacker.getEntityType(entity)
-            if entityType:
-                encEntities.append({
-                    "type": entityType,
+            entity_type = MessagePacker.get_entity_type(entity)
+            if entity_type:
+                enc_entities.append({
+                    "type": entity_type,
                     "offset": entity.offset,
                     "length": entity.length
                 })
-        return encEntities
+        return enc_entities
 
-    def getEntityType(entity):
+    @staticmethod
+    def get_entity_type(entity):
         t = type(entity)
         if t is MessageEntityBold:
             return "bold"
@@ -267,12 +267,12 @@ class MessagePacker:
         if t in [MessageEntityMention, MessageEntityTextUrl, MessageEntityMentionName,
                  MessageEntityHashtag, MessageEntityCashtag, MessageEntityBotCommand]:
             return "bluetext"
-        return null
+        return
 
-    async def downloadMedia(self, inMedia, thumb=null):
-        media = MessagePacker.getMedia(inMedia)
+    async def download_media(self, in_media, thumb=None):
+        media = MessagePacker.get_media(in_media)
         if not media:
-            return null
+            return
         mid = str(media.id)
         if thumb:
             mid += "." + str(thumb)
@@ -285,7 +285,8 @@ class MessagePacker:
             self.files[mid] = (str(len(self.files)), dl, mime)
         return self.files[mid][0]
 
-    def getMedia(media):
+    @staticmethod
+    def get_media(media):
         t = type(media)
         if t is MessageMediaPhoto:
             return media.photo
@@ -296,22 +297,22 @@ class MessagePacker:
         elif t is MessageMediaWebPage:
             if media.webpage.type == "photo":
                 return media.webpage.photo
-        return null
+        return
 
-    async def downloadProfilePicture(self, entity):
+    async def download_profile_picture(self, entity):
         media = entity.photo
         if not media or isinstance(media, ChatPhotoEmpty):
-            return null
+            return
         mid = str(media.photo_id)
         if mid not in self.files:
             dl = await self.client.download_profile_photo(entity, bytes)
             self.files[mid] = (str(len(self.files)), dl, "image/jpg")
         return self.files[mid][0]
 
-    async def encodeAuthor(self, msg):
+    async def encode_author(self, msg):
         obj = dict()
 
-        uid, name, picture, adminTitle = await self.getAuthor(msg)
+        uid, name, picture, admin_title = await self.get_author(msg)
 
         obj.id = uid
         obj.name = name
@@ -319,16 +320,16 @@ class MessagePacker:
             obj.picture = {
                 "file": picture
             }
-        if adminTitle:
-            obj.adminTitle = adminTitle
+        if admin_title:
+            obj.adminTitle = admin_title
 
         return obj
 
-    async def getAuthor(self, msg, full=true):
-        uid = null
-        name = null
-        picture = null
-        adminTitle = null
+    async def get_author(self, msg, full=True):
+        uid = None
+        name = None
+        picture = None
+        admin_title = None
 
         chat = msg.peer_id
         peer = msg.from_id or chat
@@ -353,7 +354,6 @@ class MessagePacker:
                 name.encode("utf-8")).hexdigest(6), 16)
 
         if not name:
-            entity = null
             try:
                 entity = await self.client.get_entity(peer)
             except Exception:
@@ -365,24 +365,24 @@ class MessagePacker:
                 name = utils.get_display_name(entity)
 
             if full:
-                picture = await self.downloadProfilePicture(entity)
+                picture = await self.download_profile_picture(entity)
 
-                if isinstance(chat, (PeerChannel, PeerChat)):
+                if isinstance(chat, PeerChannel):
                     admins = await self.client.get_participants(chat, filter=ChannelParticipantsAdmins)
                     for admin in admins:
                         participant = admin.participant
                         if participant.user_id == uid:
-                            adminTitle = participant.rank
-                            if not adminTitle:
+                            admin_title = participant.rank
+                            if not admin_title:
                                 if isinstance(participant, ChannelParticipantCreator):
-                                    adminTitle = "owner"
+                                    admin_title = "owner"
                                 else:
-                                    adminTitle = "admin"
+                                    admin_title = "admin"
                             break
 
-        return uid, name, picture, adminTitle
+        return uid, name, picture, admin_title
 
-    async def encodeReply(self, reply):
+    async def encode_reply(self, reply):
         obj = dict()
 
         text = reply.message
@@ -392,14 +392,18 @@ class MessagePacker:
             media = reply.media
             if media:
                 t = type(media)
-                obj.text = "📷 Photo" if t is MessageMediaPhoto else "💾 File"
-        name = (await self.getAuthor(reply, full=false))[1]
+                if t is MessageMediaPhoto:
+                    obj.text = "📷 Photo"
+                else:
+                    obj.text = "💾 File"
+
+        name = (await self.get_author(reply, full=False))[1]
 
         obj.author = name
 
         media = reply.media
         if media:
-            file = await self.downloadMedia(media, -1)
+            file = await self.download_media(media, -1)
             if file:
                 obj.thumbnail = {
                     "file": file
@@ -409,14 +413,14 @@ class MessagePacker:
 
 
 async def update(modules, message, url=MODULE_PATH):
-    loader = next(
-        filter(lambda x: x.__class__.__name__ == "LoaderMod", modules))
+    loader = next(filter(lambda x: "LoaderMod" ==
+                                   x.__class__.__name__, modules))
     try:
         if await loader.download_and_install(url, message):
             loader._db.set(__name__, "loaded_modules",
                            list(set(loader._db.get(__name__, "loaded_modules", [])).union([url])))
-            return true
+            return True
         else:
-            return false
+            return False
     except Exception:
-        return false
+        return False
